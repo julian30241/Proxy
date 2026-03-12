@@ -1,0 +1,12 @@
+{
+  "name": "eagler-proxy-render",
+  "version": "1.0.0",
+  "description": "Servidor Proxy de Respaldo para Magma Node",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "http-proxy": "^1.18.1"
+  }
+}
