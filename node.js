@@ -3,7 +3,7 @@ const httpProxy = require('http-proxy');
 
 // 1. Configuramos el túnel apuntando a tu Magma Node
 const proxy = httpProxy.createProxyServer({
-    target: 'ws://91.98.80.233:25877',
+    target: 'ws://mccurso.funserver.app',
     ws: true,
     changeOrigin: true,
     xfwd: true,          // Fundamental en Render para pasar firewalls
