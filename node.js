@@ -3,7 +3,7 @@ const httpProxy = require('http-proxy');
 const dns = require('dns');
 
 // Nuestra variable dinámica (empieza con la que sabemos que funciona)
-let dynamicTarget = 'ws://91.98.80.233:25877'; 
+let dynamicTarget = 'ws://46.224.7.62:25877'; 
 
 // 🕵️‍♂️ LA MAGIA: Función que rastrea el servidor como si fuera Minecraft Java
 function rastrearServidor() {
