@@ -2,39 +2,48 @@ const http = require('http');
 const httpProxy = require('http-proxy');
 const dns = require('dns');
 
-// Nuestra variable dinámica (empieza con la que sabemos que funciona)
-let dynamicTarget = 'ws://46.224.7.62:25877'; 
+let dynamicTarget = 'ws://91.98.80.233:25877'; // Target de emergencia
+let radarStatus = "Iniciando escaneo..."; // Nuevo: Monitor de estado
 
-// 🕵️‍♂️ LA MAGIA: Función que rastrea el servidor como si fuera Minecraft Java
+// 🕵️‍♂️ EL RADAR MEJORADO CON DIAGNÓSTICO
 function rastrearServidor() {
-    // 1. Preguntamos por el registro SRV oculto de tu dominio
     dns.resolveSrv('_minecraft._tcp.mccurso.funserver.top', (err, records) => {
-        if (!err && records.length > 0) {
+        if (err) {
+            radarStatus = `❌ Error buscando SRV (El server de Funserver podría estar apagado o el DNS no ha actualizado): ${err.code}`;
+            return;
+        }
+        
+        if (records.length > 0) {
             const puertoNuevo = records[0].port;
             const hostMisterioso = records[0].name;
             
-            // 2. Traducimos el nombre a una IP numérica pura
             dns.resolve4(hostMisterioso, (err, ips) => {
-                if (!err && ips.length > 0) {
+                if (err) {
+                    radarStatus = `❌ Error traduciendo la IP de Funserver: ${err.code}`;
+                    return;
+                }
+                
+                if (ips.length > 0) {
                     const ipNueva = ips[0];
                     const nuevoDestino = `ws://${ipNueva}:${puertoNuevo}`;
+                    radarStatus = `✅ Radar OK. Conexión establecida con Funserver.`;
                     
-                    // Si cambió, actualizamos el túnel en tiempo real
                     if (dynamicTarget !== nuevoDestino) {
                         dynamicTarget = nuevoDestino;
-                        console.log(`[RADAR] 🔄 Nueva IP/Puerto detectado: ${dynamicTarget}`);
+                        console.log(`[RADAR] 🔄 Target actualizado a: ${dynamicTarget}`);
                     }
                 }
             });
+        } else {
+            radarStatus = "⚠️ No se encontraron registros de Minecraft en ese dominio.";
         }
     });
 }
 
-// Ejecutamos el radar al encender, y luego cada 5 minutos (300000 ms)
+// Ejecutamos el radar rápido al inicio, y luego cada 1 minuto (60000 ms) para que reaccione más rápido
 rastrearServidor();
-setInterval(rastrearServidor, 300000);
+setInterval(rastrearServidor, 60000);
 
-// Configuramos el Proxy base (sin target fijo)
 const proxy = httpProxy.createProxyServer({
     ws: true,
     changeOrigin: true,
@@ -43,18 +52,19 @@ const proxy = httpProxy.createProxyServer({
     timeout: 10000
 });
 
-// Servidor web de camuflaje que te avisa a dónde está apuntando
+// 📊 TU NUEVO PANEL DE CONTROL WEB
 const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end(`Servidor Backup Online 🟢.\nTarget actual: ${dynamicTarget}`);
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.write(`=== 🛡️ PANEL DE CONTROL SYSADMIN ===\n\n`);
+    res.write(`Estado del Radar: ${radarStatus}\n`);
+    res.write(`Target Actual:    ${dynamicTarget}\n`);
+    res.end();
 });
 
-proxy.on('error', (err) => { /* Silencio en caso de micro-cortes */ });
+proxy.on('error', (err) => { /* Silencio anti-crasheo */ });
 
-// El túnel dinámico
 server.on('upgrade', (req, socket, head) => {
     socket.setNoDelay(true);
-    // 🎯 ¡AQUÍ ESTÁ EL TRUCO! Le pasamos el target dinámico en tiempo real
     proxy.ws(req, socket, head, { target: dynamicTarget }, (err) => {
         if (err) socket.destroy();
     });
@@ -62,5 +72,5 @@ server.on('upgrade', (req, socket, head) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Autopilot Proxy activo en el puerto ${PORT}`);
+    console.log(`🚀 Autopilot V2 activo en el puerto ${PORT}`);
 });
