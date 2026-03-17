@@ -2,12 +2,12 @@ const http = require('http');
 const httpProxy = require('http-proxy');
 const dns = require('dns');
 
-let dynamicTarget = 'ws://5.9.41.143:33902'; // Target de emergencia
+let dynamicTarget = 'ws://108.181.149.194:25711'; // Target de emergencia
 let radarStatus = "Iniciando escaneo..."; // Nuevo: Monitor de estado
 
 // 🕵️‍♂️ EL RADAR MEJORADO CON DIAGNÓSTICO
 function rastrearServidor() {
-    dns.resolveSrv('_minecraft._tcp.mccursos.funserver.top', (err, records) => {
+    dns.resolveSrv('108.181.149.194:25711/', (err, records) => {
         if (err) {
             radarStatus = `❌ Error buscando SRV (El server de Funserver podría estar apagado o el DNS no ha actualizado): ${err.code}`;
             return;
