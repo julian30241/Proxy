@@ -2,12 +2,12 @@ const http = require('http');
 const httpProxy = require('http-proxy');
 const dns = require('dns');
 
-let dynamicTarget = 'ws://108.181.149.194:25711'; // Target de emergencia
+let dynamicTarget = 'ws://190.215.136.165:25565'; // Target de emergencia
 let radarStatus = "Iniciando escaneo..."; // Nuevo: Monitor de estado
 
 // 🕵️‍♂️ EL RADAR MEJORADO CON DIAGNÓSTICO
 function rastrearServidor() {
-    dns.resolveSrv('108.181.149.194:25711/', (err, records) => {
+    dns.resolveSrv('190.215.136.165:25565', (err, records) => {
         if (err) {
             radarStatus = `❌ Error buscando SRV (El server de Funserver podría estar apagado o el DNS no ha actualizado): ${err.code}`;
             return;
